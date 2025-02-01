@@ -1,7 +1,11 @@
 import fs from 'fs'
-import frontmatter from 'gray-matter'
 import path from 'path'
-const homepage = path.posix.join(process.cwd(), 'content/index.md')
+
+import frontmatter from 'gray-matter'
+import { languageKeys } from '#src/languages/lib/languages.js'
+import { ROOT } from '#src/frame/lib/constants.js'
+
+const homepage = path.posix.join(ROOT, 'content/index.md')
 const { data } = frontmatter(fs.readFileSync(homepage, 'utf8'))
 const productIds = data.children
 
@@ -15,8 +19,7 @@ export default {
     ignoreDuringBuilds: true,
   },
   i18n: {
-    // locales: Object.values(languages).map(({ code }) => code),
-    locales: ['en', 'cn', 'ja', 'es', 'pt'],
+    locales: languageKeys,
     defaultLocale: 'en',
   },
   sassOptions: {
@@ -34,6 +37,7 @@ export default {
   webpack: (config) => {
     config.experiments = config.experiments || {}
     config.experiments.topLevelAwait = true
+    config.resolve.fallback = { fs: false }
     return config
   },
 
@@ -53,5 +57,12 @@ export default {
     // but many of our pages are much larger.
     // The warning is: https://nextjs.org/docs/messages/large-page-data
     largePageDataBytes: 1024 * 1024, // 1 MB
+
+    // This makes it so that going Back will scroll to the previous position
+    scrollRestoration: true,
+  },
+
+  compiler: {
+    styledComponents: true,
   },
 }
